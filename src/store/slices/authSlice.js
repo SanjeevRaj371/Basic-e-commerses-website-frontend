@@ -1,15 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../utils/axios'; // Use api instance instead of axios directly
 
 // Async thunks
 export const loginUser = createAsyncThunk(
   'auth/login',
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await axios.post('/api/auth/login', userData);
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-      }
+      const response = await api.post('/api/auth/login', userData);
+      // No token storage - authentication removed
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -23,10 +21,8 @@ export const registerUser = createAsyncThunk(
   'auth/register',
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await axios.post('/api/auth/register', userData);
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-      }
+      const response = await api.post('/api/auth/register', userData);
+      // No token storage - authentication removed
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -45,11 +41,8 @@ export const loadUser = createAsyncThunk(
         throw new Error('No token found');
       }
       
-      const response = await axios.get('/api/auth/me', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      // Use api instance - it will automatically add the Authorization header via interceptor
+      const response = await api.get('/api/auth/me');
       return response.data;
     } catch (error) {
       localStorage.removeItem('token');
@@ -64,12 +57,8 @@ export const updateProfile = createAsyncThunk(
   'auth/updateProfile',
   async (userData, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.put('/api/auth/profile', userData, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      // Use api instance - it will automatically add the Authorization header via interceptor
+      const response = await api.put('/api/auth/profile', userData);
       return response.data;
     } catch (error) {
       return rejectWithValue(

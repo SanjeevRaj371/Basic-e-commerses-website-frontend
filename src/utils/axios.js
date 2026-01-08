@@ -3,7 +3,7 @@ import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const api = axios.create({
-  baseURL: "https://basic-e-commerses-website-backend.onrender.com/",
+  baseURL: "https://basic-e-commerses-website-backend.onrender.com/", // Use environment variable - NO trailing slash!
   headers: {
     'Content-Type': 'application/json',
   },
@@ -12,13 +12,18 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
+    // Get token from localStorage
     const token = localStorage.getItem('token');
+    
+    // Only add Authorization header if token exists
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
     return config;
   },
   (error) => {
+    // Handle request error
     return Promise.reject(error);
   }
 );
